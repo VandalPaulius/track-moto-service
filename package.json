@@ -1,0 +1,18 @@
+{
+    "name": "gps-backend",
+    "version": "0.0.0",
+    "description": "GPS tracking service backend",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "node index.js"
+    },
+    "author": "Cool guys don't look at explosions",
+    "license": "ISC",
+    "dependencies": {
+      "body-parser": "^1.18.2",
+      "express": "^4.16.2",
+      "mongodb": "^2.2.33"
+    }
+  }
+  
