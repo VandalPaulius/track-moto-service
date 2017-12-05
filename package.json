@@ -10,8 +10,13 @@
   "author": "Cool guys don't look at explosions",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
-    "express": "^4.16.2"
+    "connect-mongo": "^2.0.0",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "mongoose": "^4.13.6",
+    "node-router": "^0.1.5"
   },
   "devDependencies": {
     "mongodb": "^2.2.33"
