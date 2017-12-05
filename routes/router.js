@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
+var Tracker = require('../models/tracker');
 
 function requiresLogin(req, res, next) {
   if (req.session && req.session.userId) {
@@ -51,15 +52,6 @@ router.post('/api/user', (req, res) =>{
   });  
 }); 
 
-//Check if specified email exists
-router.get('/api/user/checkEmail/:email', (req, res) => {
-  MongoClient.connect(mongo_url, function (err, db) {
-    db.collection('users').find({email: email}, {email: 0, password: 0, username: 0}).limit(1);
-    db.close();
-  });
-  checkUserEmail(req.params.email);
-});
-
 router.post('/api/user/login', (req, res) =>{ 
   User.authenticate(req.body.email, req.body.password, function (error, user) {
     if (error || !user) {
@@ -87,7 +79,23 @@ router.get('/api/user/logout', (req, res, next) => {
   }
 });
 
-router.post('/api/:uid/trackers') //create trackers
+//Create tracker
+router.post('/api/:uid/trackers', (req, res) => {
+  var trackerData = {
+    user_id: req.params.uid,
+    phone_number: req.body.phone_number,
+    device_name: req.body.device_name
+  }
+  
+  Tracker.create(trackerData, function(error){
+    if(error){
+
+    } else{
+
+    }
+  });
+});
+
 router.get('/api/:uid/trackers') //get trackers
 
 router.post('/api/:uid/trackers/:tracker_uid/location', (req, res) => {
@@ -107,3 +115,12 @@ router.post('/api/:uid/trackers/:tracker_uid/location', (req, res) => {
 router.get('/api/:uid/trackers/:tracker_uid/location')
 
 module.exports = router;
+
+//Check if specified email exists
+/*router.get('/api/user/checkEmail/:email', (req, res) => {
+  MongoClient.connect(mongo_url, function (err, db) {
+    db.collection('users').find({email: email}, {email: 0, password: 0, username: 0}).limit(1);
+    db.close();
+  });
+  checkUserEmail(req.params.email);
+});*/
