@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var DeviceSchema = new mongoose.Schema({
+var TrackerSchema = new mongoose.Schema({
   user_id: {
     type: String,
     unique: false,
@@ -21,12 +21,12 @@ var DeviceSchema = new mongoose.Schema({
   }
 });
 
-var Device = mongoose.model('Device', DeviceSchema);
-//module.exports = device;
+var Tracker = mongoose.model('Tracker', TrackerSchema);
+module.exports = Tracker;
 
 function createDevice(data) {
-  var device = new Device(data);
-  device.save(function (err) {
+  var tracker = new Tracker(data);
+  tracker.save(function (err) {
       if (err) return handleError(err);
       // saved!
   })

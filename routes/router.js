@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
 var Tracker = require('../models/tracker');
+var LocationSnapshot = require('../models/location_snapshot');
+var StatusSnapshot = require('../models/status_snapshot');
+var validator = require('validator');
 
 function requiresLogin(req, res, next) {
   if (req.session && req.session.userId) {
@@ -13,7 +16,7 @@ function requiresLogin(req, res, next) {
   }
 }
 
-// GET route after registering
+// GET route
 router.get('/', requiresLogin, (req, res, next) => {
   User.findById(req.session.userId)
     .exec(function (error, user) {
@@ -25,42 +28,45 @@ router.get('/', requiresLogin, (req, res, next) => {
           err.status = 400;
           return next(err);
         } else {
-          return res.send('<h1>Name: </h1>' + user.username + '<h2>Mail: </h2>' + user.email + '<br><a type="button" href="/logout">Logout</a>')
+          return res.send('<h1>Name: </h1>' + user.username + '<h2>Mail: </h2>' + user.email + '<br><a type="button" href="/api/user/logout">Logout</a>')
         }
       }
     });
 });
 
 //Create user
-router.post('/api/user', (req, res) =>{ 
-  console.log("Creating user ", JSON.stringify(req.body.username));
-  res.status(200).send('OK');
-
+router.post('/api/user', (req, res, next) =>{ 
+  
+  if(!validator.isEmail(req.body.email)){
+    var err = new Error('Wrong email');
+    err.status = 400;
+    return next(err);
+  }
+  
   var userData = {
     email: req.body.email,
     password: req.body.password,
     username: req.body.username
-  }
+  };
 
   User.create(userData, function(error, user){
     if(error){
-
+      res.status(401).end();
     } else{
       req.session.userId = user._id;
-      return res.redirect('/');
+      res.status(200).end();
     }
   });  
 }); 
 
-router.post('/api/user/login', (req, res) =>{ 
+router.post('/api/user/login', (req, res, next) =>{
+  console.log('body: ' + JSON.stringify(req.body)); 
   User.authenticate(req.body.email, req.body.password, function (error, user) {
     if (error || !user) {
-      var err = new Error('Wrong email or password.');
-      err.status = 401;
-      return next(err);
+      res.status(401).end();
     } else {
       req.session.userId = user._id;
-      return res.redirect('/');
+      return res.status(200).end();
     }
   });
 });
@@ -80,23 +86,33 @@ router.get('/api/user/logout', (req, res, next) => {
 });
 
 //Create tracker
-router.post('/api/:uid/trackers', (req, res) => {
-  var trackerData = {
-    user_id: req.params.uid,
-    phone_number: req.body.phone_number,
-    device_name: req.body.device_name
-  }
-  
-  Tracker.create(trackerData, function(error){
+router.post('/api/trackers', (req, res) => {
+  User.findById(req.session.user_id).exec(function(error, user){
     if(error){
 
     } else{
+      var trackerData = {
+        user_id: req.params.uid,
+        phone_number: req.body.phone_number,
+        device_name: req.body.device_name
+      }
 
+      Tracker.create(trackerData, function(error){
+        if(error){
+    
+        } else{
+    
+        }
+      });
     }
-  });
+  })
 });
 
-router.get('/api/:uid/trackers') //get trackers
+//Get trackers
+router.get('/api/:uid/trackers', (req, res) =>{
+  var trackers = Tracker.find({'user_id': req.params.uid});
+  res.send(trackers);
+});
 
 router.post('/api/:uid/trackers/:tracker_uid/location', (req, res) => {
     console.log("device_id", JSON.stringify(req.body.device_id));
@@ -106,13 +122,16 @@ router.post('/api/:uid/trackers/:tracker_uid/location', (req, res) => {
     assert.equal(null, err);
     insertTrackingData(db, req.body.device_id, req.body.timestamp, 
       req.body.latitude, req.body.longitude, 
-      function() {
+      function() { 
         db.close();
     });
   });
 });
 
-router.get('/api/:uid/trackers/:tracker_uid/location')
+//Get location data
+router.get('/api/:uid/trackers/:tracker_uid/location', (req, res) => {
+
+});
 
 module.exports = router;
 

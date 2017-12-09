@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const db_collection = 'tracking_data';
+var path = require('path');
 
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
@@ -26,6 +27,7 @@ db.once('open', function () {
 //Use sessions for tracking logins
 app.use(session({
   secret: 'work hard',
+  cookie: {maxAge: 600000},
   resave: true,
   saveUninitialized: false,
   store: new MongoStore({
@@ -34,23 +36,12 @@ app.use(session({
 }));
 
 //Parse incoming requests
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //Include routes
 
 app.use('/', routes);
-
-/*var createUser = function(db, email, password, username, callback){
-  db.collection('users').insertOne({
-    "email": email,
-    "password": password,
-    "username": username
-  }, function(err, result){
-    assert.equal(err, null);
-    console.log("Created user");
-    callback();
-  });
-}*/
 
 /*var checkUserEmail = function(email, callback){
   var test;
@@ -73,31 +64,7 @@ var createDevice = function(db, user_id, phone_number, device_name){
   });
 }
 
-var insertStatusData = function(db, device_id, timestamp, device_state, battery_level, callback){
-  db.collection(db_collection).insertOne({
-    "device_id": device_id,
-    "timestamp": timestamp,
-    "device_state": device_state,
-    "battery_level": battery_level   
-  }, function(err, result){
-    assert.equal(err, null);
-    console.log("Inserted status data");
-    callback();
-  });
-}
-
-var insertTrackingData = function(db, device_id, timestamp, latitude, longitude, callback) {
-  db.collection(db_collection).insertOne({
-    "device_id": device_id,
-    "timestamp": timestamp,
-    "latitude": latitude,
-    "longitude": longitude
-  }, function(err, result) {
-   assert.equal(err, null);
-   console.log("Inserted tracking data");
-   callback();
- });
-};*/
+*/
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -110,7 +77,11 @@ app.use(function (req, res, next) {
 // define as the last app.use callback
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
-  res.send(err.message);
+  if(err.status == 401){
+    res.sendFile(path.join(__dirname + '/views', 'login.html'));
+  } else{
+    res.send(err.message);
+  }
 });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
