@@ -1,0 +1,25 @@
+{
+  "name": "gps-backend",
+  "version": "0.0.0",
+  "description": "GPS tracking service backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Cool guys don't look at explosions",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "connect-mongo": "^2.0.0",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "mongoose": "^4.13.6",
+    "node-router": "^0.1.5",
+    "validator": "^9.1.2"
+  },
+  "devDependencies": {
+    "mongodb": "^2.2.33"
+  }
+}
