@@ -6,6 +6,8 @@ var LocationSnapshot = require('../models/location_snapshot');
 var StatusSnapshot = require('../models/status_snapshot');
 var validator = require('validator');
 
+//app.use(express.static(__dirname + '/views')); //Serves resources from public folder
+
 function requiresLogin(req, res, next) {
   if (req.session && req.session.userId) {
     return next();

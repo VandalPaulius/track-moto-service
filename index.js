@@ -39,8 +39,10 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//Include routes
+//Supply static files from the views folder
+app.use(express.static(__dirname + '/views'));
 
+//Include routes
 app.use('/', routes);
 
 /*var checkUserEmail = function(email, callback){
