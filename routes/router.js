@@ -1,6 +1,9 @@
-exports.configure = (router, database) => {
-  // app.use(`/api/${process.env.APPLICATION_API_VERSION}`, router);
+exports.configurePages = (router) => {
+  const pages = require('./pages');
+  pages.configure(router);
+}
 
+exports.configureApi = (router, database) => {
   const authorization = require('./authorization');
   authorization.configure(router, database);
 }

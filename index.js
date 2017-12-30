@@ -1,3 +1,5 @@
+global.__basedir = __dirname;
+
 const initEnv = () => require('dotenv').config();
 
 const initDb = () => {
@@ -30,7 +32,8 @@ const initDb = () => {
 const initHttpListener = (database) => {
   const express = require('express');
   const app = express();
-  const router = express.Router();
+  const apiRouter = express.Router();
+  const pageRouter = express.Router();
   const session = require('express-session');
   const bodyParser = require('body-parser');
   const routes = require('./routes');
@@ -52,10 +55,11 @@ const initHttpListener = (database) => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  routes.configure(router, database);
+  routes.configurePages(pageRouter);
+  routes.configureApi(apiRouter, database);
 
-  app.use(`/api/${process.env.APPLICATION_API_VERSION}`, router);
-  //app.use('/', router);
+  app.use('/', pageRouter);
+  app.use(`/api/${process.env.APPLICATION_API_VERSION}`, apiRouter);
 
   app.listen(process.env.PORT, () =>
     console.log(`Example app listening on port ${process.env.PORT}!`));
