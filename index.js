@@ -32,6 +32,7 @@ const initDb = () => {
 const initHttpListener = (database) => {
   const express = require('express');
   const app = express();
+  const subdomain = require('express-subdomain');
   const apiRouter = express.Router();
   const pageRouter = express.Router();
   const session = require('express-session');
@@ -59,7 +60,9 @@ const initHttpListener = (database) => {
   routes.configureApi(apiRouter, database);
 
   app.use('/', pageRouter);
-  app.use(`/api/${process.env.APPLICATION_API_VERSION}`, apiRouter);
+  //app.use(`/api/${process.env.APPLICATION_API_VERSION}`, apiRouter);
+  //app.use(subdomain(`api.${process.env.APPLICATION_API_VERSION}`, apiRouter));
+  app.use(subdomain(`api`, apiRouter));
 
   app.listen(process.env.PORT, () =>
     console.log(`Example app listening on port ${process.env.PORT}!`));
