@@ -1,90 +1,71 @@
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const db_collection = 'tracking_data';
-var path = require('path');
+const initEnv = () => require('dotenv').config();
 
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
-var mongo_url = 'mongodb://localhost:27017/test';
+const initDb = () => {
+  const mongodb = require('mongodb');
+  const mongoose = require('mongoose');
 
-var routes = require('./routes/router');
+  const session = require('express-session');
+  const MongoStore = require('connect-mongo')(session);
 
-var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
+  const mongoClient = mongodb.MongoClient;
 
-//Connect to MongoDB
-mongoose.connect(mongo_url);
-var db = mongoose.connection;
+  mongoose.connect(process.env.APPLICATION_MONGODB_URL);
+  const db = mongoose.connection;
 
-//Handle mongo error
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-  // we're connected!
-});
+  let error;
 
-//Use sessions for tracking logins
-app.use(session({
-  secret: 'work hard',
-  cookie: {maxAge: 600000},
-  resave: true,
-  saveUninitialized: false,
-  store: new MongoStore({
+  db.on('error', err => error = `Mongoose connection failed: ${err}`);
+  db.once('open', () => console.log('MongoDb connected successfully'));
+
+  if (error) {
+    console.log(error);
+    return false;
+  }
+
+  return new MongoStore({
     mongooseConnection: db
   })
-}));
-
-//Parse incoming requests
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-//Supply static files from the views folder
-app.use(express.static(__dirname + '/views'));
-
-//Include routes
-app.use('/', routes);
-
-/*var checkUserEmail = function(email, callback){
-  var test;
-  MongoClient.connect(mongo_url, function (err, db) {
-    test = db.collection('users').find({email: email}, {email: 0, password: 0, username: 0}).limit(1);
-    db.close();
-  });
-  return test;
 }
 
-var createDevice = function(db, user_id, phone_number, device_name){
-  db.collection(db_collection).insertOne({
-    "user_id": user_id,
-    "phone_number": phone_number,
-    "device_name": device_name  
-  }, function(err, result){
-    assert.equal(err, null);
-    console.log("Created device");
-    callback();
-  });
-}
+const initHttpListener = (database) => {
+  const express = require('express');
+  const app = express();
+  const router = express.Router();
+  const session = require('express-session');
+  const bodyParser = require('body-parser');
+  const routes = require('./routes/router');
 
-*/
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  var err = new Error('File Not Found');
-  err.status = 404;
-  next(err);
-});
-
-// error handler
-// define as the last app.use callback
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  if(err.status == 401){
-    res.sendFile(path.join(__dirname + '/views', 'login.html'));
-  } else{
-    res.send(err.message);
+  if (!database) {
+    console.log('Cannot run without database');
+    return;
   }
-});
+  //Use sessions for tracking logins
+  app.use(session({
+    secret: 'work hard',
+    cookie: {maxAge: 600000},
+    resave: true,
+    saveUninitialized: false,
+    store: database
+  }));
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'));
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
 
+  // routes
+
+  app.use(`/api/${process.env.APPLICATION_API_VERSION}`, router);
+
+  app.listen(process.env.PORT, () =>
+    console.log(`Example app listening on port ${process.env.PORT}!`));
+}
+
+try {
+  initEnv();
+  const db = initDb();
+  initHttpListener(db);
+} catch (err) {
+  if (err) {
+    console.log('API startup failed: ', err);
+    process.exit(1);
+  }
+}
