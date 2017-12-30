@@ -55,6 +55,7 @@ const initHttpListener = (database) => {
   routes.configure(router, database);
 
   app.use(`/api/${process.env.APPLICATION_API_VERSION}`, router);
+  //app.use('/', router);
 
   app.listen(process.env.PORT, () =>
     console.log(`Example app listening on port ${process.env.PORT}!`));
