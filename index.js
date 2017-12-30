@@ -33,7 +33,8 @@ const initHttpListener = (database) => {
   const router = express.Router();
   const session = require('express-session');
   const bodyParser = require('body-parser');
-  const routes = require('./routes/router');
+  const routes = require('./routes');
+
 
   if (!database) {
     console.log('Cannot run without database');
@@ -51,7 +52,7 @@ const initHttpListener = (database) => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  // routes
+  routes.configure(router, database);
 
   app.use(`/api/${process.env.APPLICATION_API_VERSION}`, router);
 
