@@ -60,9 +60,8 @@ const initHttpListener = (database) => {
   routes.configureApi(apiRouter, database);
 
   app.use('/', pageRouter);
-  //app.use(`/api/${process.env.APPLICATION_API_VERSION}`, apiRouter);
-  //app.use(subdomain(`api.${process.env.APPLICATION_API_VERSION}`, apiRouter));
-  app.use(subdomain(`api`, apiRouter));
+  /* in dev environment add url to hosts file */
+  app.use(subdomain(`api.${process.env.APPLICATION_API_VERSION}`, apiRouter));
 
   app.listen(process.env.PORT, () =>
     console.log(`Example app listening on port ${process.env.PORT}!`));
