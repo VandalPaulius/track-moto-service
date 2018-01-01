@@ -61,32 +61,6 @@ router.post('/api/user', (req, res, next) =>{
   });  
 }); 
 
-router.post('/api/user/login', (req, res, next) =>{
-  console.log('body: ' + JSON.stringify(req.body)); 
-  User.authenticate(req.body.email, req.body.password, function (error, user) {
-    if (error || !user) {
-      res.status(401).end();
-    } else {
-      req.session.userId = user._id;
-      return res.status(200).end();
-    }
-  });
-});
-
-//GET for logout
-router.get('/api/user/logout', (req, res, next) => {
-  if (req.session) {
-    // delete session object
-    req.session.destroy(function (err) {
-      if (err) {
-        return next(err);
-      } else {
-        return res.redirect('/');
-      }
-    });
-  }
-});
-
 //Create tracker
 router.post('/api/trackers', (req, res) => {
   User.findById(req.session.user_id).exec(function(error, user){
