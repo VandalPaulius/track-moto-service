@@ -37,7 +37,7 @@ const initHttpListener = (database) => {
   const pageRouter = express.Router();
   const session = require('express-session');
   const bodyParser = require('body-parser');
-  const routes = require('./routes');
+  const router = require('./router');
 
 
   if (!database) {
@@ -56,8 +56,8 @@ const initHttpListener = (database) => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  routes.configurePages(pageRouter);
-  routes.configureApi(apiRouter, database);
+  router.configurePages(pageRouter);
+  router.configureApi(apiRouter, database);
 
   app.use('/', pageRouter);
   /* in dev environment add url to hosts file */

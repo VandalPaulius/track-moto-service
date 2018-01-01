@@ -1,12 +1,12 @@
 exports.configurePages = (router) => {
-  const pages = require('./pages');
+  const pages = require('./routes/pages');
   pages.configure(router);
 }
 
 exports.configureApi = (router, database) => {
-  const authorization = require('./authorization');
+  const authorization = require('./routes/authorization');
   authorization.configure(router, database);
 
-  const user = require('./user');
+  const user = require('./routes/user');
   user.configure(router, database);
 }
