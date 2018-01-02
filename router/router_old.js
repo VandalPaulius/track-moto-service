@@ -36,31 +36,6 @@ router.get('/', requiresLogin, (req, res, next) => {
     });
 });
 
-//Create user
-router.post('/api/user', (req, res, next) =>{ 
-  
-  if(!validator.isEmail(req.body.email)){
-    var err = new Error('Wrong email');
-    err.status = 400;
-    return next(err);
-  }
-  
-  var userData = {
-    email: req.body.email,
-    password: req.body.password,
-    username: req.body.username
-  };
-
-  User.create(userData, function(error, user){
-    if(error){
-      res.status(401).end();
-    } else{
-      req.session.userId = user._id;
-      res.status(200).end();
-    }
-  });  
-}); 
-
 router.post('/api/user/login', (req, res, next) =>{
   console.log('body: ' + JSON.stringify(req.body)); 
   User.authenticate(req.body.email, req.body.password, function (error, user) {
