@@ -36,33 +36,8 @@ router.get('/', requiresLogin, (req, res, next) => {
     });
 });
 
-//Create user
-router.post('/api/user', (req, res, next) =>{ 
-  
-  if(!validator.isEmail(req.body.email)){
-    var err = new Error('Wrong email');
-    err.status = 400;
-    return next(err);
-  }
-  
-  var userData = {
-    email: req.body.email,
-    password: req.body.password,
-    username: req.body.username
-  };
-
-  User.create(userData, function(error, user){
-    if(error){
-      res.status(401).end();
-    } else{
-      req.session.userId = user._id;
-      res.status(200).end();
-    }
-  });  
-}); 
-
 router.post('/api/user/login', (req, res, next) =>{
-  console.log('body: ' + JSON.stringify(req.body)); 
+  console.log('body: ' + JSON.stringify(req.body));
   User.authenticate(req.body.email, req.body.password, function (error, user) {
     if (error || !user) {
       res.status(401).end();
@@ -101,9 +76,9 @@ router.post('/api/trackers', (req, res) => {
 
       Tracker.create(trackerData, function(error){
         if(error){
-    
+
         } else{
-    
+
         }
       });
     }
@@ -122,9 +97,9 @@ router.post('/api/:uid/trackers/:tracker_uid/location', (req, res) => {
 
   MongoClient.connect(mongo_url, function(err, db) {
     assert.equal(null, err);
-    insertTrackingData(db, req.body.device_id, req.body.timestamp, 
-      req.body.latitude, req.body.longitude, 
-      function() { 
+    insertTrackingData(db, req.body.device_id, req.body.timestamp,
+      req.body.latitude, req.body.longitude,
+      function() {
         db.close();
     });
   });

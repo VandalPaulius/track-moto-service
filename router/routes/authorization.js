@@ -12,8 +12,11 @@ const login = (db, req, res, next) => {
       res.end();
     } else {
       req.session.userId = user._id;
-      
+
       res.status(200)
+      res.json({
+        userUid: user._id
+      })
       res.end();
     }
   });
