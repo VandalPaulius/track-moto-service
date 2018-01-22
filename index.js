@@ -47,7 +47,7 @@ const initHttpListener = (database) => {
   //Use sessions for tracking logins
   app.use(session({
     secret: 'work hard',
-    cookie: {maxAge: 600000},
+    cookie: { maxAge: 600000 },
     resave: true,
     saveUninitialized: false,
     store: database
@@ -60,7 +60,7 @@ const initHttpListener = (database) => {
   router.configureApi(apiRouter, database);
 
   app.use('/', pageRouter);
-  /* in dev environment add url to hosts file */
+  // in dev environment add url to hosts file
   app.use(subdomain(`api.${process.env.APPLICATION_API_VERSION}`, apiRouter));
 
   app.listen(process.env.PORT, () =>
